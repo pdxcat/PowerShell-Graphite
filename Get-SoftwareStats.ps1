@@ -26,19 +26,19 @@ function sendToGraphite{
     $stream.Close() 
 }
 
+## This grabs the list of process that need to be ignored. 
 $excludelist = get-content $exclude
 $list = get-process | select -ExpandProperty processname | Sort-Object -Unique
 
 ## Makes every thing lower case. 
 for ($i=0; $i -lt $list.length; $i++) { $list[$i] = $list[$i].tolower() }
 
-
 ## Exlcudes any items in the exclude list. 
 foreach($eitem in $excludelist){
     $list = $list | where{$_.tolower() -notmatch $eitem.ToLower()}
 }
 
-## compares current processes to know processes and get the new processes. 
+## Compares current processes to know processes and get the new processes. 
 $diff = Compare-Object $list (Get-Content $include) | Where {$_.SideIndicator -eq "=>" } | Select -expand InputObject
 
 foreach($item in $list){
